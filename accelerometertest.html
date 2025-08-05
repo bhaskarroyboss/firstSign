@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Accelerometer Test</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+  <div class="bg-white p-8 rounded-xl shadow-md w-full max-w-lg text-center">
+      <img src="logo.jpg" alt="Stroke Detection Logo" class="h-16 mx-auto" />
+    <h1 class="text-2xl font-bold mb-4 text-red-600">Arm Movement Test</h1>
+    <p class="mb-4 text-gray-600">Fold/unfold your <span id="arm">left</span> arm as before.</p>
+
+    <button id="startBtn" class="bg-red-600 text-white px-6 py-2 rounded-xl hover:bg-red-700">Start Test</button>
+    <p id="status" class="mt-4 text-sm text-gray-700"></p>
+
+    <div id="result" class="hidden mt-4 text-left text-sm text-gray-800">
+      <p><strong>Baseline Folds:</strong> <span id="baselineCount"></span></p>
+      <p><strong>Test Folds:</strong> <span id="testCount"></span></p>
+      <p><strong>% Change:</strong> <span id="foldChange"></span>%</p>
+    </div>
+
+    <button id="nextBtn" disabled class="mt-6 bg-green-600 text-white px-6 py-2 rounded-xl hover:bg-green-700">Next</button>
+  </div>
+
+  <script>
+    let arm = "left";
+    let foldCount = 0;
+    let lastState = null;
+    let lastTime = 0;
+    const cooldown = 300;
+    const threshold = 2.5;
+
+    const startBtn = document.getElementById("startBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const status = document.getElementById("status");
+    const armLabel = document.getElementById("arm");
+    const resultDiv = document.getElementById("result");
+    const baselineCountSpan = document.getElementById("baselineCount");
+    const testCountSpan = document.getElementById("testCount");
+    const foldChangeSpan = document.getElementById("foldChange");
+
+    function reset() {
+      foldCount = 0;
+      lastState = null;
+      lastTime = 0;
+    }
+
+    function startTest() {
+      reset();
+      status.textContent = `Testing ${arm} arm...`;
+      startBtn.disabled = true;
+      nextBtn.disabled = true;
+      resultDiv.classList.add("hidden");
+
+      window.addEventListener("devicemotion", detectFold);
+
+      setTimeout(() => {
+        window.removeEventListener("devicemotion", detectFold);
+
+        const baselineRaw = localStorage.getItem(`${arm}ArmBaseline`);
+        if (!baselineRaw) {
+          alert(`Missing ${arm} arm baseline. Please register again.`);
+          return;
+        }
+        const baseline = JSON.parse(baselineRaw).foldCount || 1;
+        const foldChange = Math.max(0, baseline - foldCount) / baseline * 100;
+
+        // Save data
+        localStorage.setItem(`${arm}ArmTestFoldChange`, foldChange.toFixed(2));
+
+        // Show result
+        baselineCountSpan.textContent = baseline;
+        testCountSpan.textContent = foldCount;
+        foldChangeSpan.textContent = foldChange.toFixed(2);
+        resultDiv.classList.remove("hidden");
+        status.textContent = `${arm.toUpperCase()} arm tested.`;
+
+        nextBtn.disabled = false;
+      }, 10000);
+    }
+
+    function detectFold(e) {
+      const y = e.accelerationIncludingGravity.y || 0;
+      const now = Date.now();
+
+      if (Math.abs(y) < threshold) return;
+
+      const currentState = y > 0 ? "up" : "down";
+
+      if (lastState && currentState !== lastState && (now - lastTime) > cooldown) {
+        foldCount++;
+        lastTime = now;
+      }
+
+      lastState = currentState;
+    }
+
+    startBtn.addEventListener("click", startTest);
+
+    nextBtn.addEventListener("click", () => {
+      if (arm === "left") {
+        arm = "right";
+        armLabel.textContent = "right";
+        status.textContent = "";
+        resultDiv.classList.add("hidden");
+        startBtn.disabled = false;
+        nextBtn.disabled = true;
+      } else {
+        // Final score calculation
+        const left = parseFloat(localStorage.getItem("leftArmTestFoldChange")) || 0;
+        const right = parseFloat(localStorage.getItem("rightArmTestFoldChange")) || 0;
+        const avg = ((left + right) / 2).toFixed(2);
+        localStorage.setItem("accelerometerTestScore", avg);
+
+        alert(`Accelerometer stroke score saved: ${avg}%`);
+        window.location.href = "questionnaire.html";
+      }
+    });
+  </script>
+</body>
+</html>

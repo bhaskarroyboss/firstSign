@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stroke Detection App</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-r from-blue-100 to-indigo-200 min-h-screen flex items-center justify-center px-4">
+  <div class="bg-white rounded-2xl shadow-2xl p-8 sm:p-10 w-full max-w-md text-center space-y-6">
+    
+    <!-- Logo -->
+    <img src="logo.jpg" alt="Stroke Detection Logo" class="h-16 mx-auto" />
+    
+    <!-- Title -->
+    <h1 class="text-3xl font-bold text-indigo-700">Stroke Detection</h1>
+    
+    <!-- Subtitle -->
+    <p class="text-gray-600">Welcome! Register to begin or run a test if you're already set up.</p>
+
+    <!-- Buttons -->
+    <div class="space-y-4 pt-2">
+      <button onclick="window.location.href='register.html'"
+              class="w-full bg-blue-600 text-white py-3 rounded-xl text-lg font-medium hover:bg-blue-700 transition-all duration-300">
+        Register
+      </button>
+
+      <button onclick="checkRegistration()"
+              class="w-full bg-green-600 text-white py-3 rounded-xl text-lg font-medium hover:bg-green-700 transition-all duration-300">
+        Test
+      </button>
+    </div>
+  </div>
+
+  <script>
+    function checkRegistration() {
+      const hasUser = localStorage.getItem('strokeUserData');
+      const hasFace = localStorage.getItem('facialBaseline');
+      const hasVoice = localStorage.getItem('voiceBaseline');
+      const hasLeftArm = localStorage.getItem('leftArmBaseline');
+      const hasRightArm = localStorage.getItem('rightArmBaseline');
+
+      if (hasUser && hasFace && hasVoice && hasLeftArm && hasRightArm) {
+        window.location.href = 'facialtest.html';
+      } else {
+        alert("Registration incomplete. Please complete all baseline steps first.");
+      }
+    }
+  </script>
+</body>
+</html>

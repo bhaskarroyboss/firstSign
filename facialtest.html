@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Facial Stroke Test</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
+</head>
+<body class="bg-gray-100 p-6 flex flex-col items-center min-h-screen">
+    <img src="logo.jpg" alt="Stroke Detection Logo" class="h-16 mx-auto" />
+  <h1 class="text-2xl font-bold mb-4 text-center">Facial Stroke Test</h1>
+  <p class="text-center mb-6 text-gray-600" id="instruction">Hold a neutral expression.</p>
+
+  <video id="video" autoplay muted playsinline class="rounded-xl shadow-xl border-4 border-red-400 mb-4 w-full max-w-md"></video>
+  <canvas id="overlay" class="absolute left-0 top-0"></canvas>
+
+  <button id="captureBtn" class="bg-blue-600 text-white px-6 py-2 rounded-xl hover:bg-blue-700 transition">
+    Capture
+  </button>
+
+  <div id="result" class="mt-6 text-center hidden">
+    <p class="text-xl font-semibold" id="scoreText"></p>
+  </div>
+
+  <script>
+    const stages = [
+      { id: "neutral", text: "Hold a neutral expression." },
+      { id: "smile", text: "Smile as wide as possible." },
+      { id: "eyebrows", text: "Raise your eyebrows." },
+      { id: "blink", text: "Blink gently." }
+    ];
+
+    const instruction = document.getElementById('instruction');
+    const captureBtn = document.getElementById('captureBtn');
+    const result = document.getElementById('result');
+    const scoreText = document.getElementById('scoreText');
+
+    const baseline = JSON.parse(localStorage.getItem("facialBaseline") || "{}");
+
+    let currentStageIndex = 0;
+    let testData = {};
+    let score = 0;
+
+    const videoElement = document.getElementById('video');
+    const canvasElement = document.getElementById('overlay');
+    const canvasCtx = canvasElement.getContext('2d');
+
+    const faceMesh = new FaceMesh({
+      locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`
+    });
+
+    faceMesh.setOptions({
+      maxNumFaces: 1,
+      refineLandmarks: true,
+      minDetectionConfidence: 0.5,
+      minTrackingConfidence: 0.5
+    });
+
+    faceMesh.onResults(onResults);
+
+    function onResults(results) {
+      canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+      if (results.multiFaceLandmarks && results.multiFaceLandmarks.length > 0) {
+        const landmarks = results.multiFaceLandmarks[0];
+        drawConnectors(canvasCtx, landmarks, FACEMESH_TESSELATION, { color: '#f00', lineWidth: 1 });
+        window.currentLandmarks = landmarks;
+      }
+    }
+
+    captureBtn.addEventListener('click', () => {
+      if (!window.currentLandmarks) {
+        alert("Face not detected. Try again.");
+        return;
+      }
+
+      const stage = stages[currentStageIndex].id;
+      const current = window.currentLandmarks;
+      const base = baseline[stage];
+
+      if (base && base.length === current.length) {
+        const deviation = calculateDeviation(base, current);
+        score += deviation;
+        console.log(`Deviation for ${stage}: ${deviation}`);
+      }
+
+      currentStageIndex++;
+      if (currentStageIndex < stages.length) {
+        instruction.textContent = stages[currentStageIndex].text;
+      } else {
+        const risk = Math.min(100, Math.round(score * 100)); // Clamp to 100%
+        localStorage.setItem('strokeTestScore', risk);
+        scoreText.innerText = `Facial Stroke Risk Score: ${risk}%`;
+result.classList.remove("hidden");
+captureBtn.disabled = true;
+instruction.innerText = "Redirecting to voice test...";
+
+setTimeout(() => {
+  window.location.href = "voicetest.html";
+}, 3000);
+
+      }
+    });
+
+    function calculateDeviation(baseline, current) {
+      let total = 0;
+      let n = baseline.length;
+
+      for (let i = 0; i < n; i++) {
+        const dx = baseline[i].x - current[i].x;
+        const dy = baseline[i].y - current[i].y;
+        const dz = baseline[i].z - current[i].z;
+        const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
+        total += dist;
+      }
+
+      return total / n; // average deviation per landmark
+    }
+
+    async function setupCamera() {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      videoElement.srcObject = stream;
+
+      return new Promise((resolve) => {
+        videoElement.onloadedmetadata = () => {
+          videoElement.width = videoElement.videoWidth;
+          videoElement.height = videoElement.videoHeight;
+          canvasElement.width = videoElement.videoWidth;
+          canvasElement.height = videoElement.videoHeight;
+          resolve();
+        };
+      });
+    }
+
+    setupCamera().then(() => {
+      const camera = new Camera(videoElement, {
+        onFrame: async () => {
+          await faceMesh.send({ image: videoElement });
+        },
+        width: 640,
+        height: 480
+      });
+      camera.start();
+    });
+  </script>
+</body>
+</html>

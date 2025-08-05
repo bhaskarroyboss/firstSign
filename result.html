@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8" />
+  <title>Stroke Risk Assessment Result</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 flex flex-col items-center justify-center min-h-screen p-6">
+
+  <div class="bg-white rounded-2xl shadow-xl p-8 w-full max-w-lg text-center">
+      <img src="logo.jpg" alt="Stroke Detection Logo" class="h-16 mx-auto" />
+    <h1 class="text-3xl font-bold mb-6 text-indigo-700">Stroke Risk Assessment</h1>
+
+    <div id="scores" class="space-y-4 text-left text-gray-700">
+      <p><strong>Facial Stroke Score:</strong> <span id="faceScore">-</span>%</p>
+      <p><strong>Voice Stroke Score:</strong> <span id="voiceScore">-</span>%</p>
+      <p><strong>Arm Movement Score:</strong> <span id="accelScore">-</span>%</p>
+      <p><strong>Risk Questionnaire Score:</strong> <span id="questionnaireScore">-</span>%</p>
+    </div>
+
+    <div id="overallRiskDiv" class="mt-8 p-4 rounded-lg text-white text-lg font-semibold">
+      Overall Stroke Risk: <span id="overallRiskScore">-</span>%
+      <p id="riskLevelMsg" class="mt-2"></p>
+    </div>
+
+    <button id="resetBtn" class="mt-10 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-xl transition">
+      Reset & Start Over
+    </button>
+  </div>
+
+<script>
+  // Get stored scores, parse to floats or default 0
+  const faceScore = parseFloat(localStorage.getItem('strokeTestScore')) || 0;
+  const voiceScore = parseFloat(localStorage.getItem('voiceTestScore')) || 0;
+  const accelScore = parseFloat(localStorage.getItem('accelerometerTestScore')) || 0;
+  const questionnaireScore = parseFloat(localStorage.getItem('riskQuestionnaireScore')) || 0;
+
+  // Display individual scores
+  document.getElementById('faceScore').textContent = faceScore.toFixed(1);
+  document.getElementById('voiceScore').textContent = voiceScore.toFixed(1);
+  document.getElementById('accelScore').textContent = accelScore.toFixed(1);
+  document.getElementById('questionnaireScore').textContent = questionnaireScore.toFixed(1);
+
+  // Weighting for overall stroke risk (tune as you see fit)
+  const weights = {
+    face: 0.4,
+    voice: 0.3,
+    accel: 0.2,
+    questionnaire: 0.1,
+  };
+
+  // Calculate overall risk score weighted average
+  const overallRisk = (
+    faceScore * weights.face +
+    voiceScore * weights.voice +
+    accelScore * weights.accel +
+    questionnaireScore * weights.questionnaire
+  ).toFixed(1);
+
+  document.getElementById('overallRiskScore').textContent = overallRisk;
+
+  // Color and message based on risk
+  const overallRiskDiv = document.getElementById('overallRiskDiv');
+  const riskMsg = document.getElementById('riskLevelMsg');
+
+  if (overallRisk < 30) {
+    overallRiskDiv.style.backgroundColor = '#16a34a'; // green
+    riskMsg.textContent = 'Low risk of stroke detected. Continue to monitor and maintain healthy habits.';
+  } else if (overallRisk < 60) {
+    overallRiskDiv.style.backgroundColor = '#eab308'; // yellow
+    riskMsg.textContent = 'Moderate risk detected. Please consult a healthcare professional soon.';
+  } else {
+    overallRiskDiv.style.backgroundColor = '#dc2626'; // red
+    riskMsg.textContent = 'High risk detected! Seek emergency medical attention immediately.';
+  }
+
+  // Reset button clears all stored data and reloads index
+  document.getElementById('resetBtn').addEventListener('click', () => {
+    if (confirm('Are you sure you want to reset all data and start over?')) {
+      localStorage.clear();
+      window.location.href = 'index.html';
+    }
+  });
+</script>
+
+</body>
+</html>

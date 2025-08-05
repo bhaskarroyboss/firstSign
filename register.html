@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Register - Stroke Detection</title>
+  <script>
+    function saveUserData(event) {
+      event.preventDefault();
+
+      const name = document.getElementById('name').value.trim();
+      const age = document.getElementById('age').value.trim();
+      const questionnaire = Array.from(document.querySelectorAll('.question input:checked')).map(input => ({
+        question: input.name,
+        answer: input.value
+      }));
+
+      if (!name || !age) {
+        alert('Please fill in all required fields.');
+        return;
+      }
+
+      const userData = {
+        name,
+        age,
+        questionnaire
+      };
+
+      localStorage.setItem('strokeUserData', JSON.stringify(userData));
+      window.location.href = 'facial.html';
+    }
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+  <div class="bg-white p-8 rounded-2xl shadow-lg w-full max-w-xl">
+      <img src="logo.jpg" alt="Stroke Detection Logo" class="h-16 mx-auto" />
+    <h1 class="text-2xl font-bold mb-6 text-center">Register for Stroke Detection</h1>
+
+    <form onsubmit="saveUserData(event)" class="space-y-6">
+      <div>
+        <label for="name" class="block text-sm font-medium">Name</label>
+        <input type="text" id="name" required class="mt-1 w-full border border-gray-300 rounded-xl p-2 focus:ring-blue-500 focus:border-blue-500">
+      </div>
+
+      <div>
+        <label for="age" class="block text-sm font-medium">Age</label>
+        <input type="number" id="age" required min="0" class="mt-1 w-full border border-gray-300 rounded-xl p-2 focus:ring-blue-500 focus:border-blue-500">
+      </div>
+
+      <div class="space-y-4">
+        <p class="text-lg font-semibold">Stroke Risk Factors:</p>
+
+        <div class="question">
+          <label class="block">Do you have high blood pressure?</label>
+          <label class="mr-4"><input type="radio" name="high_blood_pressure" value="yes" required> Yes</label>
+          <label><input type="radio" name="high_blood_pressure" value="no"> No</label>
+        </div>
+
+        <div class="question">
+          <label class="block">Do you have diabetes?</label>
+          <label class="mr-4"><input type="radio" name="diabetes" value="yes" required> Yes</label>
+          <label><input type="radio" name="diabetes" value="no"> No</label>
+        </div>
+
+        <div class="question">
+          <label class="block">Do you smoke?</label>
+          <label class="mr-4"><input type="radio" name="smoking" value="yes" required> Yes</label>
+          <label><input type="radio" name="smoking" value="no"> No</label>
+        </div>
+
+        <div class="question">
+          <label class="block">Do you have a history of stroke in your family?</label>
+          <label class="mr-4"><input type="radio" name="family_history" value="yes" required> Yes</label>
+          <label><input type="radio" name="family_history" value="no"> No</label>
+        </div>
+      </div>
+
+      <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-xl hover:bg-blue-700 transition">
+        Next: Facial Registration →
+      </button>
+    </form>
+  </div>
+</body>
+</html>

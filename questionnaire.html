@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Stroke Risk Questionnaire</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-r from-indigo-100 to-blue-100 flex flex-col items-center justify-center min-h-screen px-4 py-8">
+
+  <div class="bg-white rounded-2xl shadow-xl p-8 w-full max-w-lg">
+      <img src="logo.jpg" alt="Stroke Detection Logo" class="h-16 mx-auto" />
+
+    <!-- Logo & Title -->
+    <div class="text-center mb-6">
+      <img src="logo.jpg" alt="Stroke Detection Logo" class="h-16 mx-auto mb-2" />
+      <h1 class="text-3xl font-bold text-indigo-700">Stroke Risk Questionnaire</h1>
+    </div>
+
+    <!-- Questionnaire Form -->
+    <form id="strokeForm" class="space-y-6">
+      <!-- Question 1 -->
+      <div>
+        <p class="font-semibold mb-2">1. Do you have high blood pressure?</p>
+        <label class="inline-flex items-center mr-6">
+          <input type="radio" name="q1" value="yes" required class="form-radio text-indigo-600" />
+          <span class="ml-2">Yes</span>
+        </label>
+        <label class="inline-flex items-center">
+          <input type="radio" name="q1" value="no" class="form-radio text-indigo-600" />
+          <span class="ml-2">No</span>
+        </label>
+      </div>
+
+      <!-- Question 2 -->
+      <div>
+        <p class="font-semibold mb-2">2. Do you have diabetes?</p>
+        <label class="inline-flex items-center mr-6">
+          <input type="radio" name="q2" value="yes" required class="form-radio text-indigo-600" />
+          <span class="ml-2">Yes</span>
+        </label>
+        <label class="inline-flex items-center">
+          <input type="radio" name="q2" value="no" class="form-radio text-indigo-600" />
+          <span class="ml-2">No</span>
+        </label>
+      </div>
+
+      <!-- Question 3 -->
+      <div>
+        <p class="font-semibold mb-2">3. Have you ever had a stroke before?</p>
+        <label class="inline-flex items-center mr-6">
+          <input type="radio" name="q3" value="yes" required class="form-radio text-indigo-600" />
+          <span class="ml-2">Yes</span>
+        </label>
+        <label class="inline-flex items-center">
+          <input type="radio" name="q3" value="no" class="form-radio text-indigo-600" />
+          <span class="ml-2">No</span>
+        </label>
+      </div>
+
+      <!-- Question 4 -->
+      <div>
+        <p class="font-semibold mb-2">4. Do you smoke tobacco?</p>
+        <label class="inline-flex items-center mr-6">
+          <input type="radio" name="q4" value="yes" required class="form-radio text-indigo-600" />
+          <span class="ml-2">Yes</span>
+        </label>
+        <label class="inline-flex items-center">
+          <input type="radio" name="q4" value="no" class="form-radio text-indigo-600" />
+          <span class="ml-2">No</span>
+        </label>
+      </div>
+
+      <!-- Question 5 -->
+      <div>
+        <p class="font-semibold mb-2">5. Do you have a family history of stroke?</p>
+        <label class="inline-flex items-center mr-6">
+          <input type="radio" name="q5" value="yes" required class="form-radio text-indigo-600" />
+          <span class="ml-2">Yes</span>
+        </label>
+        <label class="inline-flex items-center">
+          <input type="radio" name="q5" value="no" class="form-radio text-indigo-600" />
+          <span class="ml-2">No</span>
+        </label>
+      </div>
+
+      <!-- Question 6 -->
+      <div>
+        <p class="font-semibold mb-2">6. Do you have high cholesterol?</p>
+        <label class="inline-flex items-center mr-6">
+          <input type="radio" name="q6" value="yes" required class="form-radio text-indigo-600" />
+          <span class="ml-2">Yes</span>
+        </label>
+        <label class="inline-flex items-center">
+          <input type="radio" name="q6" value="no" class="form-radio text-indigo-600" />
+          <span class="ml-2">No</span>
+        </label>
+      </div>
+
+      <!-- Question 7 -->
+      <div>
+        <p class="font-semibold mb-2">7. Are you physically inactive or sedentary most of the time?</p>
+        <label class="inline-flex items-center mr-6">
+          <input type="radio" name="q7" value="yes" required class="form-radio text-indigo-600" />
+          <span class="ml-2">Yes</span>
+        </label>
+        <label class="inline-flex items-center">
+          <input type="radio" name="q7" value="no" class="form-radio text-indigo-600" />
+          <span class="ml-2">No</span>
+        </label>
+      </div>
+
+      <!-- Question 8 -->
+      <div>
+        <p class="font-semibold mb-2">8. Do you consume alcohol excessively?</p>
+        <label class="inline-flex items-center mr-6">
+          <input type="radio" name="q8" value="yes" required class="form-radio text-indigo-600" />
+          <span class="ml-2">Yes</span>
+        </label>
+        <label class="inline-flex items-center">
+          <input type="radio" name="q8" value="no" class="form-radio text-indigo-600" />
+          <span class="ml-2">No</span>
+        </label>
+      </div>
+
+      <!-- Question 9 -->
+      <div>
+        <p class="font-semibold mb-2">9. Have you been diagnosed with atrial fibrillation (AFib)?</p>
+        <label class="inline-flex items-center mr-6">
+          <input type="radio" name="q9" value="yes" required class="form-radio text-indigo-600" />
+          <span class="ml-2">Yes</span>
+        </label>
+        <label class="inline-flex items-center">
+          <input type="radio" name="q9" value="no" class="form-radio text-indigo-600" />
+          <span class="ml-2">No</span>
+        </label>
+      </div>
+
+      <!-- Question 10 -->
+      <div>
+        <p class="font-semibold mb-2">10. Do you experience frequent migraines or aura-related headaches?</p>
+        <label class="inline-flex items-center mr-6">
+          <input type="radio" name="q10" value="yes" required class="form-radio text-indigo-600" />
+          <span class="ml-2">Yes</span>
+        </label>
+        <label class="inline-flex items-center">
+          <input type="radio" name="q10" value="no" class="form-radio text-indigo-600" />
+          <span class="ml-2">No</span>
+        </label>
+      </div>
+
+      <!-- Submit -->
+      <button type="submit"
+              class="bg-indigo-600 text-white w-full py-3 rounded-xl font-medium text-lg hover:bg-indigo-700 transition-all duration-300">
+        Submit
+      </button>
+    </form>
+  </div>
+
+  <!-- Script -->
+  <script>
+    document.getElementById('strokeForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      const answers = [
+        event.target.q1.value,
+        event.target.q2.value,
+        event.target.q3.value,
+        event.target.q4.value,
+        event.target.q5.value,
+        event.target.q6.value,
+        event.target.q7.value,
+        event.target.q8.value,
+        event.target.q9.value,
+        event.target.q10.value,
+      ];
+
+      let questionnaireScore = 0;
+      answers.forEach(ans => {
+        if (ans === 'yes') questionnaireScore += 10;  // 10 points per 'yes' for total max 100
+      });
+
+      const baselineRiskStr = localStorage.getItem('riskFactorsScore') || "0";
+      const baselineRisk = parseInt(baselineRiskStr, 10);
+
+      const combinedRisk = Math.min(100, Math.round((questionnaireScore + baselineRisk) / 2));
+
+      localStorage.setItem('riskQuestionnaireScore', combinedRisk);
+
+      alert(`Your questionnaire risk score is ${questionnaireScore}.\nCombined with baseline risk: ${combinedRisk}`);
+
+      window.location.href = 'result.html';
+    });
+  </script>
+</body>
+</html>

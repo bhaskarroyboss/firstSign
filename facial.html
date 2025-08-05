@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Facial Baseline Registration</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
+</head>
+<body class="bg-gray-100 min-h-screen p-6 flex flex-col items-center">
+    <img src="logo.jpg" alt="Stroke Detection Logo" class="h-16 mx-auto" />
+
+  <h1 class="text-2xl font-bold mb-4 text-center">Facial Baseline Registration</h1>
+  <p class="text-center mb-6 text-gray-600" id="instruction">Please stay still with a neutral face.</p>
+
+  <video id="video" autoplay muted playsinline class="rounded-xl shadow-xl border-4 border-blue-400 mb-4 w-full max-w-md"></video>
+  <canvas id="overlay" class="absolute left-0 top-0"></canvas>
+
+  <button id="captureBtn" class="bg-blue-600 text-white px-6 py-2 rounded-xl hover:bg-blue-700 transition">
+    Capture
+  </button>
+
+  <script>
+    const stages = [
+      { id: "neutral", text: "Please stay still with a neutral face." },
+      { id: "smile", text: "Please smile broadly." },
+      { id: "eyebrows", text: "Please raise your eyebrows." },
+      { id: "blink", text: "Please blink gently." }
+    ];
+
+    let currentStageIndex = 0;
+    let baselineData = {};
+
+    const instruction = document.getElementById('instruction');
+    const captureBtn = document.getElementById('captureBtn');
+    const videoElement = document.getElementById('video');
+    const canvasElement = document.getElementById('overlay');
+    const canvasCtx = canvasElement.getContext('2d');
+
+    // Setup MediaPipe FaceMesh
+    const faceMesh = new FaceMesh({
+      locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`
+    });
+
+    faceMesh.setOptions({
+      maxNumFaces: 1,
+      refineLandmarks: true,
+      minDetectionConfidence: 0.5,
+      minTrackingConfidence: 0.5
+    });
+
+    faceMesh.onResults(onResults);
+
+    let videoWidth, videoHeight;
+
+    async function setupCamera() {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      videoElement.srcObject = stream;
+
+      return new Promise((resolve) => {
+        videoElement.onloadedmetadata = () => {
+          videoWidth = videoElement.videoWidth;
+          videoHeight = videoElement.videoHeight;
+          videoElement.width = videoWidth;
+          videoElement.height = videoHeight;
+          canvasElement.width = videoWidth;
+          canvasElement.height = videoHeight;
+          resolve();
+        };
+      });
+    }
+
+    function onResults(results) {
+      canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+      if (results.multiFaceLandmarks && results.multiFaceLandmarks.length > 0) {
+        const landmarks = results.multiFaceLandmarks[0];
+        drawConnectors(canvasCtx, landmarks, FACEMESH_TESSELATION, { color: '#0ff', lineWidth: 1 });
+        window.currentLandmarks = landmarks;
+      }
+    }
+
+    captureBtn.addEventListener('click', () => {
+      if (!window.currentLandmarks) {
+        alert("Face not detected. Try again.");
+        return;
+      }
+
+      const key = stages[currentStageIndex].id;
+      baselineData[key] = window.currentLandmarks.map(point => ({ x: point.x, y: point.y, z: point.z }));
+
+      currentStageIndex++;
+      if (currentStageIndex < stages.length) {
+        instruction.textContent = stages[currentStageIndex].text;
+      } else {
+        localStorage.setItem('facialBaseline', JSON.stringify(baselineData));
+        alert("Facial baseline saved successfully!");
+        window.location.href = "voice.html"; // Next step (optional)
+      }
+    });
+
+    setupCamera().then(() => {
+      const camera = new Camera(videoElement, {
+        onFrame: async () => {
+          await faceMesh.send({ image: videoElement });
+        },
+        width: 640,
+        height: 480
+      });
+      camera.start();
+    });
+  </script>
+</body>
+</html>
